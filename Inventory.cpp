@@ -1,3 +1,5 @@
+// Implementation file of Inventory class
+
 #include "Inventory.h"
 
 Inventory::Inventory()
@@ -77,6 +79,7 @@ void Inventory::addItem(const Item &a)
 		temp[i] = pItem[i];
 
 	temp[size] = a;
+
 	size++;
 
 	if (pItem != nullptr)
@@ -104,39 +107,42 @@ void Inventory::setItemList(const Item a[], int size)
 	}
 }
 
-int Inventory::getItem(int id, int qty)
+Item Inventory::getItem(int id, int qty)
 {
-	int quantity = 0;
+	Item temp;
 
-	if (qty > 0)
+	if (qty < 0)
+		qty = 0;
+
+	int i = 0;
+	bool found = false;
+
+	while (!found && i < size)
 	{
-		int i = 0;
-		bool found = false;
-
-		while (!found && i < size)
-		{
-			if (pItem[i].id == id)
-				found = true;
-			else
-				i++;
-		}
-
-		if (found)
-		{
-			if (pItem[i].qty < qty)
-			{
-				quantity = pItem[i].qty;
-				pItem[i].qty = 0;
-			}
-			else
-			{
-				quantity = qty;
-				pItem[i].qty -= qty;
-			}
-		}
+		if (pItem[i].id == id)
+			found = true;
+		else
+			i++;
 	}
 
-	return quantity;
+	if (found)
+	{
+		if (pItem[i].qty < qty)
+		{
+			temp = pItem[i];
+			pItem[i].qty = 0;
+		}
+		else
+		{
+			temp = pItem[i];
+			temp.initQty = temp.qty = qty;
+			pItem[i].qty -= qty;
+		}
+	}
+	else
+		throw "Error: Item not found";
+
+	return temp;
 }
 
 Inventory &Inventory::operator=(const Inventory &a)
